@@ -1,0 +1,20 @@
+version: "3"
+services:
+  db:
+    image: mariadb:10.6.5
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    ports:
+      - "${TYPEORM_PORT}:${TYPEORM_PORT}"
+    environment:
+      MYSQL_TCP_PORT: ${TYPEORM_PORT}
+      MARIADB_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${TYPEORM_DATABASE}
+      MARIADB_USER: ${TYPEORM_USERNAME}
+      MARIADB_PASSWORD: ${TYPEORM_PASSWORD}
+
+  redis:
+    image: "redis:alpine"
+    restart: always
+    ports:
+      - 6379:6379

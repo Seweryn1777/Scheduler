@@ -1,0 +1,5 @@
+export { CreateAvailabilitiesDto } from './create-availabilities.dto'
+export { DeleteAvailabilitiesDto } from './delete-availabilities.dto'
+export { GetTeacherAvailabilitiesDto } from './get-teacher-availabilities.dto'
+export { GetAvailabilitiesDto } from './get-availabilities.dto'
+export { GetAvailabilityDto } from './get-availability.dto'
