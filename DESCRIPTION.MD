@@ -41,7 +41,7 @@ are available at that time and add a meeting with one of them.
             .orderBy('A.startDate', OrderWay.ASC)
             .getRawMany<GetAvailabilitiesDao>()
 
-        const startDates = [...new Set([...availabilities.map(availability => availability.startDate)])]
+        const startDates = [...new Set(availabilities.map(availability => availability.startDate))]
         const availabilityRecord = availabilities.reduce<Record<number, GetAvailabilitiesDao>>(
             (acc, currentItem) => ({ ...acc, [currentItem.startDate]: currentItem }),
             {}
