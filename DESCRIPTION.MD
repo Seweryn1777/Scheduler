@@ -1,4 +1,4 @@
-## User microservice
+## Scheduler microservice
 Scheduler microservice is a standalone part of the language platform application,
 based on the NestJS framework and microservice architecture. 
 Its main purpose is to enable the management of teacher availability and student appointments. 
