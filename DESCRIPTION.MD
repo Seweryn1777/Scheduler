@@ -1,4 +1,4 @@
-## User microservice
+## Scheduler microservice
 Scheduler microservice is a standalone part of the language platform application,
 based on the NestJS framework and microservice architecture. 
 Its main purpose is to enable the management of teacher availability and student appointments. 
@@ -23,8 +23,8 @@ Notifications are sent via email.
 
 ## Code example
 
-We fetch the availability of teachers in the selected time frame, e.g. a week and in the given language.
-Then we return non-duplicated availability dates. By clicking on a given time you can see which teachers
+Student fetch the availability of teachers in the selected time frame, e.g. a week and in the given language.
+Then endpoint return non-duplicated availability dates. By clicking on a given time student can see which teachers
 are available at that time and add a meeting with one of them.
 
 ```javascript
