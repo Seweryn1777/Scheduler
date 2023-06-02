@@ -29,3 +29,11 @@ export type UsersEmailInfo = {
     lastName: string
     email: string
 }
+
+export type User = {
+    userUUID: string
+    firstName: string
+    lastName: string
+    email: string
+    role: Role
+}
