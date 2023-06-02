@@ -26,7 +26,7 @@ export class AvailabilityService {
     ) {}
 
     async createAvailability(teacherUUID: string, dates: Array<AvailabilityInterval>) {
-        const [teacher] = await this.userService.getTeachers([teacherUUID])
+        const teacher = await this.userService.getTeacher(teacherUUID)
 
         if (!teacher) {
             const error: ErrorResponse = {

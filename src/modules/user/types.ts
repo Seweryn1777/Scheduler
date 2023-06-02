@@ -2,7 +2,11 @@ import { Role } from 'lib/common'
 import { Language } from 'lib/types'
 
 export enum UserMicroserviceCommand {
-    GetUser = 'get-user'
+    GetUsers = 'get-users',
+    GetTeachers = 'get-teachers',
+    GetTeacher = 'get-teacher',
+    GetUser = 'get-user',
+    GetUsersEmailInfo = 'get-users-email-info'
 }
 
 export type GetUser = {
@@ -25,4 +29,11 @@ export type Teacher = {
     language: Language
     description: string
     imageUrl: string
+}
+
+export type UsersEmailInfo = {
+    userUUID: string
+    firstName: string
+    lastName: string
+    email: string
 }

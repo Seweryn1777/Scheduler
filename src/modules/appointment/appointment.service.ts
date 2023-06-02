@@ -1,7 +1,7 @@
 import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Connection, Repository } from 'typeorm'
-import { getUnixTime, subHours, subMinutes } from 'date-fns'
+import { Connection, In, Repository } from 'typeorm'
+import { addMinutes, getUnixTime, subHours, subMinutes } from 'date-fns'
 import { AppointmentEntity, AvailabilityEntity } from 'lib/entities'
 import { AppointmentStatus, ErrorResponse, User } from 'lib/types'
 import { getConfig } from 'lib/config'
@@ -13,8 +13,9 @@ import { NotificationService } from 'modules/notification'
 import { AvailabilityService } from 'modules/availability'
 import { OrderService } from 'modules/order'
 import { CancelAppointmentDto, CreateAppointmentDto } from './dto'
-import { MINUTES_TO_START_REMAINING, MINUTES_TO_END_REMAINING } from './constants'
-import { GetAppointmentRemainingDao, GetNumberOfUsedAppointmentsDao } from './dao'
+import { MINUTES_TO_END_REMAINING } from './constants'
+import { GetAppointmentDao, GetAppointmentRemainingDao, GetNumberOfUsedAppointmentsDao } from './dao'
+import { TeacherReminders } from './types'
 
 const T = en_US
 
@@ -29,34 +30,60 @@ export class AppointmentService {
         private readonly db: Connection
     ) {}
 
-    async appointmentReminderCron() {
+    async handleAppointmentReminderCron() {
         const reminders = await this.getAppointmentsRemainders()
 
         if (!R.hasElements(reminders)) {
             return Promise.resolve([])
         }
 
-        await this.notificationService.sendReminder({ reminders })
+        const teachersUUID = reminders.map(reminder => reminder.teacherUUID)
+        const studentUUID = reminders.map(reminder => reminder.studentUUID)
+        const [teachers, students] = await Promise.all([
+            this.userService.getUsersEmailInfo(teachersUUID),
+            this.userService.getUsersEmailInfo(studentUUID)
+        ])
+
+        if (!R.hasElements(teachers) || !R.hasElements(students)) {
+            return Promise.resolve([])
+        }
+
+        const teachersReminderRecord = reminders.reduce<Record<string, GetAppointmentRemainingDao>>(
+            (acc, currentItem) => ({ ...acc, [currentItem.teacherUUID]: currentItem }),
+            {}
+        )
+        const teachersReminders = teachers.map(teacher => {
+            const { userUUID, ...rest } = teacher
+
+            return {
+                teacherFirstName: rest.firstName,
+                teacherLastName: rest.lastName,
+                teacherEmail: rest.email,
+                ...teachersReminderRecord[teacher.userUUID]
+            }
+        })
+        const studentsRemindersRecord = teachersReminders.reduce<Record<string, TeacherReminders>>(
+            (acc, currentItem) => ({ ...acc, [currentItem.studentUUID]: currentItem }),
+            {}
+        )
+        const remindersToSend = students.map(student => {
+            const { userUUID, ...rest } = student
+
+            return {
+                studentFirstName: rest.firstName,
+                studentLastName: rest.lastName,
+                studentEmail: rest.email,
+                ...studentsRemindersRecord[student.userUUID]
+            }
+        })
+
+        await this.notificationService.sendReminder({ reminders: remindersToSend })
     }
 
-    getAppointmentsRemainders() {
-        const startDate = getUnixTime(subMinutes(new Date(), MINUTES_TO_START_REMAINING))
-        const endDate = getUnixTime(subMinutes(new Date(), MINUTES_TO_END_REMAINING))
+    async handleFinishedAppointmentsCron() {
+        const finishedAppointmentsUUID = await this.getFinishedAppointmentsUUID()
 
-        return this.appointmentRepository
-            .createQueryBuilder('A')
-            .select(
-                `
-                S.email AS studentEmail,
-                S.firstName AS studentFirstName,
-                S.lastName AS studentLastName,
-                T.firstName AS teacherFirstName,
-                T.lastName AS teacherLastName,
-                A.date
-            `
-            )
-            .where('A.date > :startDate AND A.date < :endDate', { startDate, endDate })
-            .getRawMany<GetAppointmentRemainingDao>()
+        await this.updateAppointmentsStatus(finishedAppointmentsUUID)
     }
 
     async createAppointment(dto: CreateAppointmentDto, user: User) {
@@ -226,6 +253,40 @@ export class AppointmentService {
 
     getAppointment(appointmentUUID: string) {
         return this.appointmentRepository.findOne({ where: { appointmentUUID } })
+    }
+
+    private getAppointmentsRemainders() {
+        const startDate = getUnixTime(new Date())
+        const endDate = getUnixTime(addMinutes(new Date(), MINUTES_TO_END_REMAINING))
+
+        return this.appointmentRepository
+            .createQueryBuilder('A')
+            .select('A.studentUUID, A.startDate, A.teacherUUID')
+            .where('A.startDate > :startDate AND A.startDate <= :endDate', { startDate, endDate })
+            .getRawMany<GetAppointmentRemainingDao>()
+    }
+
+    private getFinishedAppointmentsUUID() {
+        const now = getUnixTime(new Date())
+
+        return this.appointmentRepository
+            .createQueryBuilder('AP')
+            .select('AP.appointmentUUID')
+            .where('AP.endDate < :now', { now })
+            .andWhere('AP.status = :status', { status: AppointmentStatus.Scheduled })
+            .getRawMany<GetAppointmentDao>()
+            .then(appointments => appointments.map(appointment => appointment.appointmentUUID))
+    }
+
+    private updateAppointmentsStatus(finishedAppointmentsUUID: Array<string>) {
+        return this.appointmentRepository.update(
+            {
+                appointmentUUID: In(finishedAppointmentsUUID)
+            },
+            {
+                status: AppointmentStatus.Finished
+            }
+        )
     }
 
     private async getNumberOfUsedAppointments(studentUUID: string) {

@@ -1,3 +1,4 @@
 export enum CronCommand {
-    Remainder = 'remainder'
+    Remainder = 'remainder',
+    FinishedAppointments = 'finished-appointments'
 }

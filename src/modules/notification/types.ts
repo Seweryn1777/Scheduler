@@ -2,15 +2,18 @@ export enum NotificationMicroserviceCommand {
     SendReminder = 'send-reminder'
 }
 
-type SendReminder = {
-    studentEmail: string
-    studentFirstName: string
-    studentLastName: string
+type Reminder = {
+    studentUUID: string
+    teacherUUID: string
+    startDate: number
     teacherFirstName: string
     teacherLastName: string
-    date: number
+    teacherEmail: string
+    studentFirstName: string
+    studentLastName: string
+    studentEmail: string
 }
 
-export type SendReminders = {
-    reminders: Array<SendReminder>
+export type Reminders = {
+    reminders: Array<Reminder>
 }

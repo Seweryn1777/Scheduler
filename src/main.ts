@@ -26,12 +26,20 @@ const bootstrap = async () => {
         switch (command) {
             case CronCommand.Remainder:
                 try {
-                    await appointmentService.appointmentReminderCron()
+                    await appointmentService.handleAppointmentReminderCron()
                 } catch (error) {
                     logger.error('REMAINDER_CRON_ERROR', error as Error)
                 }
 
                 break
+            case CronCommand.FinishedAppointments:
+                    try {
+                        await appointmentService.handleFinishedAppointmentsCron()
+                    } catch (error) {
+                        logger.error('REMAINDER_CRON_ERROR', error as Error)
+                    }
+    
+                    break
             default:
                 appService.commandNotFound()
                 break
@@ -39,7 +47,7 @@ const bootstrap = async () => {
 
         return app.close()
     }
-
+    
     app.connectMicroservice({
         transport: Transport.REDIS,
         options: {
