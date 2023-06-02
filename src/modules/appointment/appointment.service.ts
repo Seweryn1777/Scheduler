@@ -273,8 +273,15 @@ export class AppointmentService {
 
         this.notificationService.sendCancellationAppointment({
             startDate: appointment.startDate,
-            teacher,
-            student
+            teacherUUID: teacher.userUUID,
+            teacherFirstName: teacher.firstName,
+            teacherLastName: teacher.lastName,
+            teacherEmail: teacher.email,
+            studentUUID: student.userUUID,
+            studentFirstName: student.firstName,
+            studentLastName: student.lastName,
+            studentEmail: student.email,
+            teacherMessage: dto.message
         })
 
         return appointment.availabilityUUID

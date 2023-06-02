@@ -1,27 +1,30 @@
-import { User } from 'lib/types'
-
 export enum NotificationMicroserviceCommand {
-    SendReminder = 'send-reminder'
-}
-
-type Reminder = {
-    studentUUID: string
-    teacherUUID: string
-    startDate: number
-    teacherFirstName: string
-    teacherLastName: string
-    teacherEmail: string
-    studentFirstName: string
-    studentLastName: string
-    studentEmail: string
+    SendReminder = 'send-reminder',
+    SendCancellation = 'send-cancellation'
 }
 
 export type Reminders = {
-    reminders: Array<Reminder>
+    reminders: Array<Appointment>
 }
 
-export type CanceledAppointment = {
+export type Cancellation = Appointment & {
+    teacherMessage: string
+}
+
+type Appointment = Teacher & Student & {
     startDate: number
-    teacher: User
-    student: User
+}
+
+type Teacher = {
+    teacherUUID: string
+    teacherFirstName: string
+    teacherLastName: string
+    teacherEmail: string
+}
+
+type Student = {
+    studentUUID: string
+    studentFirstName: string
+    studentLastName: string
+    studentEmail: string
 }
