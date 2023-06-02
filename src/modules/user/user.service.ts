@@ -1,8 +1,9 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common'
 import { ClientProxy } from '@nestjs/microservices'
+import { User } from 'lib/types'
 import { lastValueFrom, timeout } from 'rxjs'
 import { USER_MICROSERVICE } from './constants'
-import { UserMicroserviceCommand, GetUser, User, Teacher, UsersEmailInfo } from './types'
+import { UserMicroserviceCommand, GetUser, Teacher, UsersEmailInfo } from './types'
 
 @Injectable()
 export class UserService {

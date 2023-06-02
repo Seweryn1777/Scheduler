@@ -230,6 +230,29 @@ export class AppointmentService {
             throw new BadRequestException(error)
         }
 
+        const [student, teacher] = await Promise.all([
+            this.userService.getUser({ userUUID: appointment.studentUUID, role: Role.Student }),
+            this.userService.getUser({ userUUID: appointment.teacherUUID, role: Role.Teacher })
+        ])
+
+        if (!student) {
+            const error: ErrorResponse = {
+                code: HttpStatus.BAD_REQUEST,
+                message: T.user.studentNotFound
+            }
+
+            throw new BadRequestException(error)
+        }
+
+        if (!teacher) {
+            const error: ErrorResponse = {
+                code: HttpStatus.BAD_REQUEST,
+                message: T.user.teacherNotFound
+            }
+
+            throw new BadRequestException(error)
+        }
+
         const queryRunner = this.db.createQueryRunner()
         await queryRunner.startTransaction()
 
@@ -248,11 +271,17 @@ export class AppointmentService {
             await queryRunner.release()
         }
 
+        this.notificationService.sendCancellationAppointment({
+            startDate: appointment.startDate,
+            teacher,
+            student
+        })
+
         return appointment.availabilityUUID
     }
 
     getAppointment(appointmentUUID: string) {
-        return this.appointmentRepository.findOne({ where: { appointmentUUID } })
+        return this.appointmentRepository.findOne({ where: { appointmentUUID, status: AppointmentStatus.Scheduled } })
     }
 
     private getAppointmentsRemainders() {

@@ -4,6 +4,7 @@ export const en_US = {
     },
     user: {
         studentNotFound: 'Student not found. Please contact support.',
+        teacherNotFound: 'Teacher not found. Please contact support.',
         invalidRole: 'Invalid user role. Please contact support.',
         userNotFound: 'User not found. Please contact support.'
     },

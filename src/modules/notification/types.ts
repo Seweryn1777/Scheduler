@@ -1,3 +1,5 @@
+import { User } from 'lib/types'
+
 export enum NotificationMicroserviceCommand {
     SendReminder = 'send-reminder'
 }
@@ -16,4 +18,10 @@ type Reminder = {
 
 export type Reminders = {
     reminders: Array<Reminder>
+}
+
+export type CanceledAppointment = {
+    startDate: number
+    teacher: User
+    student: User
 }

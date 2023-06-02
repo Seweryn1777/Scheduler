@@ -14,14 +14,6 @@ export type GetUser = {
     role: Role
 }
 
-export type User = {
-    userUUID: string
-    firstName: string
-    lastName: string
-    email: string
-    role: Role
-}
-
 export type Teacher = {
     teacherUUID: string
     firstName: string
