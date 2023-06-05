@@ -106,14 +106,14 @@ export class EnvironmentVariables {
     @IsString()
     readonly USER_MICROSERVICE_PREFIX: string
 
-    @IsInt()
-    readonly AVAILABILITY_SLOT_IN_MIN: number
+    @IsString()
+    readonly AVAILABILITY_SLOT_IN_MIN: string
 
-    @IsInt()
-    readonly MINUTES_TO_ADD_APPOINTMENT: number
+    @IsString()
+    readonly MINUTES_TO_ADD_APPOINTMENT: string
 
-    @IsInt()
-    readonly MINUTES_TO_REMOVE_APPOINTMENT: number
+    @IsString()
+    readonly MINUTES_TO_REMOVE_APPOINTMENT: string
 
     @IsString()
     readonly ORDER_MICROSERVICE_PREFIX: string

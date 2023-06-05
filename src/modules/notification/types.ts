@@ -11,9 +11,10 @@ export type Cancellation = Appointment & {
     teacherMessage: string
 }
 
-type Appointment = Teacher & Student & {
-    startDate: number
-}
+type Appointment = Teacher &
+    Student & {
+        startDate: number
+    }
 
 type Teacher = {
     teacherUUID: string
