@@ -6,7 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { AuthStrategy } from 'lib/types'
 import { getConfig } from 'lib/config'
 import { JwtStrategy } from './strategies'
-import { RolesGuard } from './guards'
+import { GlobalAuthGuard, RolesGuard } from './guards'
 
 @Module({
     imports: [
@@ -26,7 +26,11 @@ import { RolesGuard } from './guards'
         JwtStrategy,
         {
             provide: APP_GUARD,
-            useClass: RolesGuard
+            useClass: GlobalAuthGuard,
+        },
+        {
+            provide: APP_GUARD,
+            useClass: RolesGuard,
         }
     ]
 })
